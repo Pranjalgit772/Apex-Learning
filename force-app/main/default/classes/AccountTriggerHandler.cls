@@ -103,6 +103,7 @@ public class AccountTriggerHandler {
         }       
         
     }
+    
     public static void updateMailAddressOfContactsByMap(List<Account> accountList, Map<Id,Account> accountMap){
        
         Map<Id,Account> updatedAccount = new Map<Id,Account>();
@@ -168,6 +169,23 @@ public class AccountTriggerHandler {
             update contacts;
         }           
         
+    }
+    public static void updateShippingAddress(List<Account> accounts){
+        for(Account acc : accounts){
+            if(acc.CopyBillingToShipping__c == true){
+       			acc.ShippingCity = acc.BillingCity;
+                acc.ShippingCountry = acc.BillingCountry;
+                acc.ShippingPostalCode = acc.BillingPostalCode;
+                acc.ShippingState = acc.BillingState;
+                acc.ShippingStreet = acc.BillingStreet;                     
+            }           
+        }        
+    }
+    public static void beforeUpdatePhone(List<Account> accounts, Map<Id,Account> accountMap){
+        for(Account acc : accounts){
+            if(accountMap!=null && acc.Phone != accountMap.get(acc.Id).Phone)
+            acc.Description = 'Phone no is Updated Old Value:'+accountMap.get(acc.Id).Phone+' New Value: '+acc.Phone;
+        }
     }
     public static void updateActive(List<Account> accountList, Map<Id,Account> accountMap){
         Set<Id> accountIds = new Set<Id>();
@@ -251,6 +269,26 @@ public class AccountTriggerHandler {
         for(Account account : accounts){
             if(caseMapByAccountId.containsKey(account.Id)){
                 account.addError('You cannot Delete the Account it have some related Case');
+            }
+        }
+    }
+    public static void shareAccountWithStandardUser(List<Account> accounts){
+
+        List<AccountShare> sharingAccounts = new List<AccountShare>();
+        Id standardUserProfileId = [SELECT Id,Name FROM Profile WHERE Name = 'Standard User'].Id;
+        Group publicGroup = [SELECT Id,DeveloperName FROM Group WHERE DeveloperName = 'Admins'];
+        for (Account account : accounts) {
+            for (User standardUser : [SELECT Id FROM User WHERE ProfileId = :standardUserProfileId]) {
+                AccountShare accountShare = new AccountShare();
+                accountShare.AccountId = account.Id;
+                accountShare.UserOrGroupId = publicGroup.Id;
+                accountShare.RowCause = 'Manual';
+                accountShare.AccountAccessLevel = 'Edit';
+                accountShare.OpportunityAccessLevel = 'Edit';
+                sharingAccounts.add(accountShare);
+            }
+            if (sharingAccounts.size() > 0) {
+                insert sharingAccounts;
             }
         }
     }

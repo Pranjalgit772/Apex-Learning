@@ -6,13 +6,14 @@ trigger AccountTrigger on Account (before insert, before update, before delete, 
         }
         if(Trigger.isAfter){
             AccountTriggerHandler.createContactOpportunity(Trigger.new);
+            AccountTriggerHandler.shareAccountWithStandardUser(Trigger.new);
            //AccountTriggerHandler.createContact(Trigger.new); 
         }
     }
     if(Trigger.isUpdate){
         if(Trigger.isBefore){
-            AccountTriggerHandler2.updateAddress(Trigger.new);
-            AccountTriggerHandler2.beforeUpdatePhone(Trigger.new, Trigger.oldMap);
+            AccountTriggerHandler.updateShippingAddress(Trigger.new);
+            AccountTriggerHandler.beforeUpdatePhone(Trigger.new, Trigger.oldMap);
             AccountTriggerHandler.updateRating(Trigger.new);
             // AccountTriggerHandler.updatePrevent(Trigger.new, Trigger.oldMap);
         }
