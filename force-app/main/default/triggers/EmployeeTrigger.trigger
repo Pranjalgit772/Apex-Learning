@@ -2,15 +2,13 @@ trigger EmployeeTrigger on Employee__c (after insert, after undelete, after dele
     
     if(Trigger.isAfter){
         if(Trigger.isInsert){
-            EmployeeTriggerHandler.updateEmployeeCountOnAccount(Trigger.new);
+            EmployeeTriggerHandler.afterInsert(Trigger.new);
         }
         if(Trigger.isDelete){
-            EmployeeTriggerHandler.updateEmployeeCountOnAccount(Trigger.old);
+            EmployeeTriggerHandler.afterDelete(Trigger.old);
         }
         if(Trigger.isUndelete){
-            System.debug('Enter in Undelete');
-            EmployeeTriggerHandler.updateActive(Trigger.new);
-            EmployeeTriggerHandler.updateEmployeeCountOnAccount(Trigger.new);
+            EmployeeTriggerHandler.afterUndelete(Trigger.new);
         }
     }
 }

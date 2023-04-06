@@ -1,31 +1,20 @@
 public class AccountTriggerHandler {
-    
-    public static void createContactOpportunity(List<Account> accounts){
-        List<Contact> contacts = new List<Contact>();
-        List<Opportunity> Opportunities = new List<Opportunity>();
-        for(Account acc : accounts){
-            if(acc.Contact__c == true){
-                Contact con = new Contact();
-                con.LastName = acc.Name;
-                con.AccountId = acc.Id;
-                contacts.add(con);
-            }
-            if(acc.Opportunity__c == true && acc.Active__c =='Yes'){
-                Opportunity opp = new Opportunity();
-                opp.Name = acc.Name;
-                opp.CloseDate = System.today();
-                opp.StageName = 'Prospecting';
-                opp.AccountId = acc.Id;
-                Opportunities.add(opp);
-            }
-        }
-        if(!contacts.isEmpty()){
-            insert contacts;
-        }
-        if(!Opportunities.isEmpty()){
-            insert Opportunities;
-        }   
+
+    public static void afterInsert(List<Account> account){
+
+        AccountTriggerService.createContactOpportunity(findOutAccounts(account));
     }
+    private static Set<Id> findOutAccounts(List<Account> accounts){
+        Set<Id> AccountIds = new Set<Id>();
+
+        for(Account account:accounts){
+            if(account.Id != NULL){
+                AccountIds.add(account.Id);
+            }
+        }
+        return AccountIds;
+    }
+    
     public static void updateRating(List<Account> accounts){
         for(Account acc: accounts){
             if(acc.Industry != NULL && acc.Industry == 'Media'){

@@ -5,7 +5,7 @@ trigger AccountTrigger on Account (before insert, before update, before delete, 
             AccountTriggerHandler.updateRating(Trigger.new);
         }
         if(Trigger.isAfter){
-            AccountTriggerHandler.createContactOpportunity(Trigger.new);
+            AccountTriggerHandler.afterInsert(Trigger.new);
             AccountTriggerHandler.shareAccountWithStandardUser(Trigger.new);
            //AccountTriggerHandler.createContact(Trigger.new); 
         }
